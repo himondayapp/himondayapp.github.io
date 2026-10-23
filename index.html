@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hi Monday · แดชบอร์ดพอร์ตลงทุน</title>
+  <meta name="description" content="หุ้น คริปโต เงินสด รวมทุกตัวเลขที่ต้องรู้ไว้ในหน้าเดียว ฟรี ไม่มีโฆษณา บน iPhone, iPad และ Android">
+  <meta name="theme-color" content="#FFC107">
+
+  <!-- How the link looks when shared in a chat or a bio. -->
+  <meta property="og:title" content="Hi Monday · แดชบอร์ดพอร์ตลงทุน">
+  <meta property="og:description" content="หุ้น คริปโต เงินสด รวมไว้ในหน้าเดียว ฟรี ไม่มีโฆษณา">
+  <meta property="og:image" content="https://himondayapp.github.io/assets/app-icon.png">
+  <meta property="og:url" content="https://himondayapp.github.io/">
+  <meta property="og:type" content="website">
+
+  <link rel="icon" type="image/png" href="assets/app-icon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;800&family=Noto+Sans+Thai:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --yellow: #FFC107;
+      --ink: #1B1A17;
+      --cream: #FFFDF7;
+      --muted: #5A4A12;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--yellow);
+      color: var(--ink);
+      font-family: "Noto Sans Thai", system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px calc(32px + env(safe-area-inset-bottom));
+      text-align: center;
+    }
+
+    main {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mascot {
+      width: min(240px, 60vw);
+      height: auto;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-family: "Kanit", sans-serif;
+      font-weight: 800;
+      font-size: clamp(40px, 11vw, 52px);
+      line-height: 1.1;
+      margin: 16px 0 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-family: "Kanit", sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .price {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--muted);
+      margin: 8px 0 28px;
+    }
+
+    .stores {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .store {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 64px;
+      padding: 12px 22px;
+      border-radius: 18px;
+      background: var(--ink);
+      color: var(--cream);
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(90, 60, 0, 0.25);
+      transition: transform 120ms ease;
+    }
+
+    .store:active { transform: scale(0.98); }
+
+    .store-name {
+      font-family: "Kanit", sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+    }
+
+    .store-devices {
+      font-size: 14px;
+      opacity: 0.75;
+    }
+
+    .store:focus-visible {
+      outline: 3px solid var(--cream);
+      outline-offset: 3px;
+    }
+
+    .redirecting {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 20px 0 0;
+      min-height: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="mascot" src="assets/mascot.png" alt="น้องแกะ มาสคอตของ Hi Monday" width="240" height="240">
+    <h1>Hi Monday</h1>
+    <p class="tagline">หุ้น · คริปโต · เงินสด<br>รวมทุกตัวเลขที่ต้องรู้ไว้ในหน้าเดียว</p>
+    <p class="price">ฟรี · ไม่มีโฆษณา</p>
+
+    <nav class="stores" aria-label="ดาวน์โหลดแอป">
+      <a class="store" id="app-store" href="https://apps.apple.com/app/id6782075660">
+        <span class="store-name">App Store</span>
+        <span class="store-devices">iPhone · iPad</span>
+      </a>
+      <a class="store" id="google-play" href="https://play.google.com/store/apps/details?id=com.hellomonday">
+        <span class="store-name">Google Play</span>
+        <span class="store-devices">Android</span>
+      </a>
+    </nav>
+
+    <p class="redirecting" id="redirecting" aria-live="polite"></p>
+  </main>
+
+  <script>
+    // Send a phone or tablet straight to its own store, so most visitors never see this page.
+    // Anything else — a computer, or a device this can't tell — stays here and picks a button.
+    // Add ?stay to the address to see the page on a phone without being sent on.
+    (function () {
+      if (new URLSearchParams(location.search).has("stay")) return;
+      var ua = navigator.userAgent;
+      // iPadOS presents itself as a Mac; a Mac with a touch screen is an iPad.
+      var isApple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+      var isAndroid = /Android/.test(ua);
+      var target = isApple ? document.getElementById("app-store")
+        : isAndroid ? document.getElementById("google-play")
+        : null;
+      if (!target) return;
+      document.getElementById("redirecting").textContent =
+        "กำลังพาไปที่ " + target.querySelector(".store-name").textContent + "…";
+      location.replace(target.href);
+    })();
+  </script>
+</body>
+</html>
