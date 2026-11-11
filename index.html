@@ -206,7 +206,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version">v6</p>
+    <p class="version" id="version">v7</p>
   </main>
 
   <script>
@@ -232,17 +232,32 @@
       // matters is stretched over the whole page, and a tap anywhere is a tap on it. It has to
       // be a real link: a script sending the page on after a tap is refused like the redirect.
       // On Android the link asks for the Play app itself, which TikTok hands over.
-      if (/musical_ly|trill|BytedanceWebview|TikTok/i.test(ua)) {
+      function tapAnywhere() {
         var other = document.getElementById(isApple ? "google-play" : "app-store");
         other.style.display = "none";
         if (isAndroid) target.href = "market://details?id=com.hellomonday";
         target.classList.add("everywhere");
         note.textContent = "แตะที่ไหนก็ได้เพื่อเปิด " + storeName;
+      }
+
+      var isTikTok = /musical_ly|trill|BytedanceWebview|TikTok/i.test(ua);
+      // Beside the version, what this page took the browser for — so a report of "it does
+      // not work" says which of these paths it was on.
+      document.getElementById("version").textContent +=
+        " · " + (isTikTok ? "tiktok " : "") + (isApple ? "ios" : "android");
+
+      if (isTikTok) {
+        tapAnywhere();
         return;
       }
 
       note.textContent = "กำลังพาไปที่ " + storeName + "…";
       location.replace(target.href);
+      // Still here and still on screen two seconds later: some other app's browser refused
+      // too, without saying who it is. Give it the same tap.
+      setTimeout(function () {
+        if (document.visibilityState === "visible") tapAnywhere();
+      }, 2000);
     })();
   </script>
 </body>
