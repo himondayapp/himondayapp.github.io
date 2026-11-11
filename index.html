@@ -128,6 +128,48 @@
 
     .store[hidden] { display: none; }
 
+    /* Room at the top for the arrow, which sits over the page's corner. */
+    body.in-tiktok { align-items: flex-start; padding-top: 96px; }
+
+    .menu-hint {
+      position: fixed;
+      top: 6px;
+      right: 8px;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      color: var(--ink);
+    }
+
+    .menu-hint[hidden] { display: none; }
+
+    .menu-hint-text {
+      margin-bottom: 2px;
+      padding: 8px 14px;
+      border-radius: 14px;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: "Kanit", sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.35;
+      text-align: left;
+      box-shadow: 0 6px 14px rgba(90, 60, 0, 0.25);
+    }
+
+    .menu-hint-text b { color: var(--yellow); font-size: 20px; line-height: 1; }
+
+    .menu-hint-arrow { flex: none; animation: nudge 1s ease-in-out infinite; }
+
+    @keyframes nudge {
+      50% { transform: translateY(-6px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .menu-hint-arrow { animation: none; }
+    }
+
     .copy-link {
       width: 100%;
       border: 2px solid var(--ink);
@@ -190,6 +232,15 @@
   </style>
 </head>
 <body>
+  <!-- Shown only in TikTok's browser: points at its ⋯ menu, the way out to a real browser. -->
+  <div class="menu-hint" id="menu-hint" hidden>
+    <span class="menu-hint-text">แตะ <b>⋯</b> ตรงนี้ แล้วเลือก “เปิดในเบราว์เซอร์”<br>เพื่อดาวน์โหลดแอป</span>
+    <svg class="menu-hint-arrow" viewBox="0 0 48 56" width="48" height="56" aria-hidden="true">
+      <path d="M8 52 C 26 48, 36 34, 36 10" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+      <path d="M24 20 L36 6 L46 22" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
   <main>
     <!-- How to find the app by hand, for when the buttons lead nowhere, with the mascot
          sitting on its bottom right corner. -->
@@ -222,7 +273,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version"><a href="try.html" id="version">v11</a></p>
+    <p class="version"><a href="try.html" id="version">v12</a></p>
   </main>
 
   <script>
@@ -254,11 +305,10 @@
       //   iPhone  — no store link of any kind gets through, tapped or not.
       //   Android — only the store's web address does, and it opens as a page inside TikTok
       //             where nobody is signed in, so nothing can be installed from it.
-      // So in TikTok nobody is sent anywhere. The store button stays, for the visitor who came
-      // from a chat — asking for the Play app itself on Android, which a chat allows and which
-      // from a profile does nothing, rather than the page that leads nowhere. Under it are the
-      // ways that do work: out to a real browser by TikTok's own menu, or by copying the
-      // address, which TikTok allows; and searching the store, as the picture shows.
+      // The store itself is asked for all the same, never its web page, and if TikTok refuses
+      // so be it: the page stays, with the ways out that do work. An arrow at the top right
+      // points at TikTok's own ⋯ menu, which opens the page in a real browser; a button copies
+      // the address, which TikTok allows; and the picture shows how to search the store.
       var isTikTok = /musical_ly|trill|BytedanceWebview|TikTok/i.test(ua);
       // Beside the version, what this page took the browser for — so a report of "it does
       // not work" says which of these paths it was on.
@@ -267,18 +317,32 @@
 
       if (isTikTok) {
         document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
-        if (isAndroid) target.href = "market://details?id=com.hellomonday";
-        note.textContent = "TikTok เปิด " + storeName + " ให้ไม่ได้? แตะ ⋯ มุมขวาบน แล้วเลือก “เปิดในเบราว์เซอร์”";
+        document.body.classList.add("in-tiktok");
+        document.getElementById("menu-hint").hidden = false;
+
         var copy = document.getElementById("copy-link");
         var copyName = copy.querySelector(".store-name");
-        var browser = isApple ? "Safari" : "Chrome";
-        copy.querySelector(".store-devices").textContent = "ไปเปิดใน " + browser;
+        copy.querySelector(".store-devices").textContent = "ไปเปิดใน " + (isApple ? "Safari" : "Chrome");
         copy.hidden = false;
         copy.addEventListener("click", function () {
           navigator.clipboard.writeText("https://himondayapp.github.io/").then(
             function () { copyName.textContent = "คัดลอกแล้ว ✓"; },
             function () { copyName.textContent = "คัดลอกไม่ได้"; });
         });
+
+        if (isAndroid) {
+          // The Play app itself. Asked for from a hidden frame, so that a refusal cannot put
+          // an error page where this one is.
+          target.href = "market://details?id=com.hellomonday";
+          var frame = document.createElement("iframe");
+          frame.style.display = "none";
+          frame.src = target.href;
+          document.body.appendChild(frame);
+        } else {
+          // The App Store's address is the one form TikTok has ever passed on an iPhone, and
+          // there it opens the App Store itself. Refused, it leaves the page as it is.
+          location.href = target.href;
+        }
         return;
       }
 
