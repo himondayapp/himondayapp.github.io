@@ -213,21 +213,11 @@
       min-height: 1.5em;
     }
 
-    /* Also the way in to try.html. Lifted above the stretched store link, which would
-       otherwise take the tap. */
     .version {
-      position: relative;
-      z-index: 1;
       font-size: 12px;
+      color: var(--muted);
       opacity: 0.6;
       margin: 12px 0 0;
-    }
-
-    .version a {
-      display: inline-block;
-      padding: 10px 16px;
-      color: var(--muted);
-      text-decoration: none;
     }
   </style>
 </head>
@@ -273,7 +263,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version"><a href="try.html" id="version">v12</a></p>
+    <p class="version" id="version">v13</p>
   </main>
 
   <script>
@@ -300,7 +290,8 @@
       var storeName = target.querySelector(".store-name").textContent;
 
       // What TikTok's own browser allows depends on how the page was reached — worked out
-      // with try.html, which the version number below opens. From a chat it follows a store
+      // by tapping every kind of store link on both kinds of phone (the scratch page for that,
+      // try.html, is in this repository's history). From a chat it follows a store
       // link the visitor taps. From a profile link, which is how nearly everyone arrives:
       //   iPhone  — no store link of any kind gets through, tapped or not.
       //   Android — only the store's web address does, and it opens as a page inside TikTok
