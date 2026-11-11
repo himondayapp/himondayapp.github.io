@@ -126,6 +126,18 @@
 
     .store:active { transform: scale(0.98); }
 
+    .store[hidden] { display: none; }
+
+    .copy-link {
+      width: 100%;
+      border: 2px solid var(--ink);
+      background: var(--cream);
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
     /* The button's own link, laid over the whole page. No press animation here: a transform
        would shrink the overlay to the button the moment it is touched. */
     .store.everywhere::after {
@@ -199,13 +211,18 @@
         <span class="store-name">Google Play</span>
         <span class="store-devices">Android</span>
       </a>
+      <!-- Shown only where the store buttons cannot work: the way out to a real browser. -->
+      <button class="store copy-link" id="copy-link" type="button" hidden>
+        <span class="store-name">คัดลอกลิงก์</span>
+        <span class="store-devices"></span>
+      </button>
     </nav>
 
     <p class="redirecting" id="redirecting" aria-live="polite"></p>
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version"><a href="try.html" id="version">v10</a></p>
+    <p class="version"><a href="try.html" id="version">v11</a></p>
   </main>
 
   <script>
@@ -235,19 +252,33 @@
       // with try.html, which the version number below opens. From a chat it follows a store
       // link the visitor taps. From a profile link, which is how nearly everyone arrives:
       //   iPhone  — no store link of any kind gets through, tapped or not.
-      //   Android — only the store's web address does, and it opens as a page inside TikTok.
-      // So an Android goes down the ordinary path below, and an iPhone is not sent anywhere:
-      // it keeps its button, for the visitor who came from a chat, and is told the two ways
-      // that do work — out to a real browser, or searching the store, as the picture shows.
+      //   Android — only the store's web address does, and it opens as a page inside TikTok
+      //             where nobody is signed in, so nothing can be installed from it.
+      // So in TikTok nobody is sent anywhere. The store button stays, for the visitor who came
+      // from a chat — asking for the Play app itself on Android, which a chat allows and which
+      // from a profile does nothing, rather than the page that leads nowhere. Under it are the
+      // ways that do work: out to a real browser by TikTok's own menu, or by copying the
+      // address, which TikTok allows; and searching the store, as the picture shows.
       var isTikTok = /musical_ly|trill|BytedanceWebview|TikTok/i.test(ua);
       // Beside the version, what this page took the browser for — so a report of "it does
       // not work" says which of these paths it was on.
       document.getElementById("version").textContent +=
         " · " + (isTikTok ? "tiktok " : "") + (isApple ? "ios" : "android");
 
-      if (isTikTok && isApple) {
-        document.getElementById("google-play").style.display = "none";
-        note.textContent = "เปิดไม่ได้? แตะ ⋯ มุมขวาบน แล้วเลือก “เปิดในเบราว์เซอร์” หรือค้น “Hi Monday” ใน App Store";
+      if (isTikTok) {
+        document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
+        if (isAndroid) target.href = "market://details?id=com.hellomonday";
+        note.textContent = "TikTok เปิด " + storeName + " ให้ไม่ได้? แตะ ⋯ มุมขวาบน แล้วเลือก “เปิดในเบราว์เซอร์”";
+        var copy = document.getElementById("copy-link");
+        var copyName = copy.querySelector(".store-name");
+        var browser = isApple ? "Safari" : "Chrome";
+        copy.querySelector(".store-devices").textContent = "ไปเปิดใน " + browser;
+        copy.hidden = false;
+        copy.addEventListener("click", function () {
+          navigator.clipboard.writeText("https://himondayapp.github.io/").then(
+            function () { copyName.textContent = "คัดลอกแล้ว ✓"; },
+            function () { copyName.textContent = "คัดลอกไม่ได้"; });
+        });
         return;
       }
 
