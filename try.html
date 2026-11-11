@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Hi Monday · link test</title>
+  <style>
+    body { font: 17px/1.4 system-ui, sans-serif; margin: 20px; background: #FFFDF7; color: #1B1A17; }
+    a { display: block; margin: 12px 0; padding: 16px; border-radius: 14px; background: #1B1A17; color: #FFFDF7; text-decoration: none; }
+    h2 { font-size: 15px; margin: 28px 0 0; }
+    pre { white-space: pre-wrap; word-break: break-all; font-size: 12px; color: #5A4A12; }
+  </style>
+</head>
+<body>
+  <!-- A scratch page: each button leaves an in-app browser a different way. Open it inside the
+       app being tested, tap each, and note which ones reach the store. Not linked from anywhere. -->
+  <p>Tap each one and note which numbers open the store.</p>
+
+  <h2>iPhone · iPad</h2>
+  <a href="https://apps.apple.com/app/id6782075660">1 · App Store web address</a>
+  <a href="https://apps.apple.com/app/id6782075660" target="_blank" rel="noopener">2 · Same, in a new window</a>
+  <a href="itms-apps://apps.apple.com/app/id6782075660">3 · App Store app directly</a>
+  <a href="x-safari-https://himondayapp.github.io/">4 · This site in Safari</a>
+  <a href="https://himondayapp.github.io/" target="_blank" rel="noopener">5 · This site in a new window</a>
+
+  <h2>Android</h2>
+  <a href="https://play.google.com/store/apps/details?id=com.hellomonday">6 · Google Play web address</a>
+  <a href="market://details?id=com.hellomonday">7 · Google Play app directly</a>
+  <a href="intent://details?id=com.hellomonday#Intent;scheme=market;package=com.android.vending;end">8 · Google Play app by intent</a>
+  <a href="intent://himondayapp.github.io/#Intent;scheme=https;package=com.android.chrome;end">9 · This site in Chrome</a>
+
+  <h2>This browser calls itself</h2>
+  <pre id="ua"></pre>
+  <script>document.getElementById("ua").textContent = navigator.userAgent;</script>
+</body>
+</html>
