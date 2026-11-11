@@ -129,7 +129,7 @@
     .store[hidden] { display: none; }
 
     /* Room at the top for the arrow, which sits over the page's corner. */
-    body.on-phone { align-items: flex-start; padding-top: 96px; }
+    body.in-tiktok { align-items: flex-start; padding-top: 96px; }
 
     .menu-hint {
       position: fixed;
@@ -225,8 +225,7 @@
   </style>
 </head>
 <body>
-  <!-- Shown on phones: points at the ⋯ menu an app's own browser keeps in this corner, the way
-       out to a real browser. Placed for TikTok's. -->
+  <!-- Shown only in TikTok's browser: points at its ⋯ menu, the way out to a real browser. -->
   <div class="menu-hint" id="menu-hint" hidden>
     <span class="menu-hint-text">แตะ <b>⋯</b> ตรงนี้ แล้วเลือก “เปิดในเบราว์เซอร์”<br>เพื่อดาวน์โหลดแอป</span>
     <svg class="menu-hint-arrow" viewBox="0 0 48 56" width="48" height="56" aria-hidden="true">
@@ -267,7 +266,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version" id="version">v14</p>
+    <p class="version" id="version">v15</p>
   </main>
 
   <script>
@@ -315,8 +314,13 @@
       // it will not be sent to the store they are what is left. A browser that does go to the
       // store leaves before anyone reads them.
       document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
-      document.body.classList.add("on-phone");
-      document.getElementById("menu-hint").hidden = false;
+      // The arrow is for TikTok alone, whose ⋯ is known to sit in the top right corner. Other
+      // apps keep theirs elsewhere — bottom right, some of them — so they are told of the menu
+      // in words, below, with nothing pointing.
+      if (isTikTok) {
+        document.body.classList.add("in-tiktok");
+        document.getElementById("menu-hint").hidden = false;
+      }
 
       var copy = document.getElementById("copy-link");
       var copyName = copy.querySelector(".store-name");
@@ -354,7 +358,8 @@
       setTimeout(function () {
         if (document.visibilityState !== "visible") return;
         target.classList.add("everywhere");
-        note.textContent = "แตะที่ไหนก็ได้เพื่อเปิด " + storeName;
+        note.textContent = "แตะที่ไหนก็ได้เพื่อเปิด " + storeName +
+          " หรือเปิดเมนู ⋯ ของแอปนี้ แล้วเลือก “เปิดในเบราว์เซอร์”";
       }, 2000);
     })();
   </script>
