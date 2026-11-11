@@ -124,6 +124,14 @@
       outline-offset: 3px;
     }
 
+    .search-help {
+      width: 100%;
+      height: auto;
+      margin-top: 28px;
+      border-radius: 18px;
+      box-shadow: 0 8px 18px rgba(90, 60, 0, 0.25);
+    }
+
     .redirecting {
       font-size: 14px;
       color: var(--muted);
@@ -151,6 +159,10 @@
     </nav>
 
     <p class="redirecting" id="redirecting" aria-live="polite"></p>
+
+    <!-- For when the buttons lead nowhere: how to find the app by hand. -->
+    <img class="search-help" id="search-help" src="assets/app-store-search.png" loading="lazy"
+         alt="หรือค้นใน App Store พิมพ์ &quot;Hi Monday&quot; แล้วมองหาไอคอนสีเหลือง" width="840" height="1050">
   </main>
 
   <script>
@@ -163,6 +175,8 @@
       // iPadOS presents itself as a Mac; a Mac with a touch screen is an iPad.
       var isApple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
       var isAndroid = /Android/.test(ua);
+      // The picture shows the App Store, which an Android has no use for.
+      if (isAndroid) document.getElementById("search-help").style.display = "none";
       var target = isApple ? document.getElementById("app-store")
         : isAndroid ? document.getElementById("google-play")
         : null;
