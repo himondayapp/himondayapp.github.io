@@ -170,11 +170,21 @@
       min-height: 1.5em;
     }
 
+    /* Also the way in to try.html. Lifted above the stretched store link, which would
+       otherwise take the tap. */
     .version {
+      position: relative;
+      z-index: 1;
       font-size: 12px;
-      color: var(--muted);
       opacity: 0.6;
       margin: 12px 0 0;
+    }
+
+    .version a {
+      display: inline-block;
+      padding: 10px 16px;
+      color: var(--muted);
+      text-decoration: none;
     }
   </style>
 </head>
@@ -206,7 +216,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version" id="version">v7</p>
+    <p class="version"><a href="try.html" id="version">v8</a></p>
   </main>
 
   <script>
