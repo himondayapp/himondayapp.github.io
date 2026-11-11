@@ -54,10 +54,39 @@
       align-items: center;
     }
 
-    .mascot {
-      width: min(240px, 60vw);
+    .hero {
+      position: relative;
+      width: min(300px, 72vw);
+    }
+
+    .search-help {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 18px;
+      box-shadow: 0 8px 18px rgba(90, 60, 0, 0.25);
+    }
+
+    /* The mascot, cut to a circle, on the picture's bottom right corner. */
+    .hero-mascot {
+      position: absolute;
+      right: 3.5%;
+      bottom: 2.5%;
+      width: 24%;
       height: auto;
       border-radius: 50%;
+      border: 3px solid var(--yellow);
+    }
+
+    /* An Android has no App Store to search, so it gets the mascot alone. */
+    .hero.mascot-only { width: min(240px, 60vw); }
+    .hero.mascot-only .search-help { display: none; }
+    .hero.mascot-only .hero-mascot {
+      position: static;
+      display: block;
+      width: 100%;
+      border-width: 6px;
+      border-color: var(--cream);
     }
 
     h1 {
@@ -124,14 +153,6 @@
       outline-offset: 3px;
     }
 
-    .search-help {
-      width: 100%;
-      height: auto;
-      margin-top: 28px;
-      border-radius: 18px;
-      box-shadow: 0 8px 18px rgba(90, 60, 0, 0.25);
-    }
-
     .redirecting {
       font-size: 14px;
       color: var(--muted);
@@ -142,7 +163,13 @@
 </head>
 <body>
   <main>
-    <img class="mascot" src="assets/mascot.png" alt="น้องแกะ มาสคอตของ Hi Monday" width="240" height="240">
+    <!-- How to find the app by hand, for when the buttons lead nowhere, with the mascot
+         sitting on its bottom right corner. -->
+    <div class="hero" id="hero">
+      <img class="search-help" src="assets/app-store-search.png"
+           alt="หรือค้นใน App Store พิมพ์ &quot;Hi Monday&quot; แล้วมองหาไอคอนสีเหลือง" width="840" height="1050">
+      <img class="hero-mascot" src="assets/mascot-circle.png" alt="น้องแกะ มาสคอตของ Hi Monday" width="360" height="360">
+    </div>
     <h1>Hi Monday</h1>
     <p class="tagline">หุ้น · คริปโต · เงินสด<br>รวมทุกตัวเลขที่ต้องรู้ไว้ในหน้าเดียว</p>
     <p class="price">ฟรี · ไม่มีโฆษณา</p>
@@ -159,10 +186,6 @@
     </nav>
 
     <p class="redirecting" id="redirecting" aria-live="polite"></p>
-
-    <!-- For when the buttons lead nowhere: how to find the app by hand. -->
-    <img class="search-help" id="search-help" src="assets/app-store-search.png" loading="lazy"
-         alt="หรือค้นใน App Store พิมพ์ &quot;Hi Monday&quot; แล้วมองหาไอคอนสีเหลือง" width="840" height="1050">
   </main>
 
   <script>
@@ -175,8 +198,7 @@
       // iPadOS presents itself as a Mac; a Mac with a touch screen is an iPad.
       var isApple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
       var isAndroid = /Android/.test(ua);
-      // The picture shows the App Store, which an Android has no use for.
-      if (isAndroid) document.getElementById("search-help").style.display = "none";
+      if (isAndroid) document.getElementById("hero").classList.add("mascot-only");
       var target = isApple ? document.getElementById("app-store")
         : isAndroid ? document.getElementById("google-play")
         : null;
