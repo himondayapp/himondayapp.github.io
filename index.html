@@ -78,17 +78,6 @@
       border: 3px solid var(--yellow);
     }
 
-    /* An Android has no App Store to search, so it gets the mascot alone. */
-    .hero.mascot-only { width: min(240px, 60vw); }
-    .hero.mascot-only .search-help { display: none; }
-    .hero.mascot-only .hero-mascot {
-      position: static;
-      display: block;
-      width: 100%;
-      border-width: 6px;
-      border-color: var(--cream);
-    }
-
     h1 {
       font-family: "Kanit", sans-serif;
       font-weight: 800;
@@ -193,7 +182,7 @@
     <!-- How to find the app by hand, for when the buttons lead nowhere, with the mascot
          sitting on its bottom right corner. -->
     <div class="hero" id="hero">
-      <img class="search-help" src="assets/app-store-search.png"
+      <img class="search-help" id="search-help" src="assets/app-store-search.png"
            alt="หรือค้นใน App Store พิมพ์ &quot;Hi Monday&quot; แล้วมองหาไอคอนสีเหลือง" width="840" height="1050">
       <img class="hero-mascot" src="assets/mascot-circle.png" alt="น้องแกะ มาสคอตของ Hi Monday" width="360" height="360">
     </div>
@@ -216,7 +205,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version"><a href="try.html" id="version">v8</a></p>
+    <p class="version"><a href="try.html" id="version">v9</a></p>
   </main>
 
   <script>
@@ -229,7 +218,12 @@
       // iPadOS presents itself as a Mac; a Mac with a touch screen is an iPad.
       var isApple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
       var isAndroid = /Android/.test(ua);
-      if (isAndroid) document.getElementById("hero").classList.add("mascot-only");
+      // An Android is shown the same search in its own store.
+      if (isAndroid) {
+        var help = document.getElementById("search-help");
+        help.src = "assets/google-play-search.png";
+        help.alt = help.alt.replace("App Store", "Google Play");
+      }
       var target = isApple ? document.getElementById("app-store")
         : isAndroid ? document.getElementById("google-play")
         : null;
