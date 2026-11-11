@@ -137,6 +137,16 @@
 
     .store:active { transform: scale(0.98); }
 
+    /* The button's own link, laid over the whole page. No press animation here: a transform
+       would shrink the overlay to the button the moment it is touched. */
+    .store.everywhere::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+    }
+
+    .store.everywhere:active { transform: none; }
+
     .store-name {
       font-family: "Kanit", sans-serif;
       font-weight: 600;
@@ -206,14 +216,17 @@
       var note = document.getElementById("redirecting");
       var storeName = target.querySelector(".store-name").textContent;
 
-      // TikTok's own browser refuses to leave for a store, with or without a tap, and sending
-      // it to the store's web address strands the visitor on a page that goes nowhere. So
-      // nothing is attempted here: leave the one button that matters, and say how to get out
-      // to a real browser, which sends them on by itself.
+      // TikTok's own browser will not leave for a store by itself, but it follows a link the
+      // visitor taps — tried on both kinds of phone with try.html. So the one button that
+      // matters is stretched over the whole page, and a tap anywhere is a tap on it. It has to
+      // be a real link: a script sending the page on after a tap is refused like the redirect.
+      // On Android the link asks for the Play app itself, which TikTok hands over.
       if (/musical_ly|trill|BytedanceWebview|TikTok/i.test(ua)) {
         var other = document.getElementById(isApple ? "google-play" : "app-store");
         other.style.display = "none";
-        note.textContent = "ถ้าปุ่มเปิดไม่ได้ แตะ ⋯ มุมขวาบน แล้วเลือก “เปิดในเบราว์เซอร์”";
+        if (isAndroid) target.href = "market://details?id=com.hellomonday";
+        target.classList.add("everywhere");
+        note.textContent = "แตะที่ไหนก็ได้เพื่อเปิด " + storeName;
         return;
       }
 
