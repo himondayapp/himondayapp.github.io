@@ -129,7 +129,7 @@
     .store[hidden] { display: none; }
 
     /* Room at the top for the arrow, which sits over the page's corner. */
-    body.in-tiktok { align-items: flex-start; padding-top: 96px; }
+    body.on-phone { align-items: flex-start; padding-top: 96px; }
 
     .menu-hint {
       position: fixed;
@@ -170,7 +170,10 @@
       .menu-hint-arrow { animation: none; }
     }
 
+    /* Lifted above the store link when that is stretched over the page. */
     .copy-link {
+      position: relative;
+      z-index: 1;
       width: 100%;
       border: 2px solid var(--ink);
       background: var(--cream);
@@ -222,7 +225,8 @@
   </style>
 </head>
 <body>
-  <!-- Shown only in TikTok's browser: points at its ⋯ menu, the way out to a real browser. -->
+  <!-- Shown on phones: points at the ⋯ menu an app's own browser keeps in this corner, the way
+       out to a real browser. Placed for TikTok's. -->
   <div class="menu-hint" id="menu-hint" hidden>
     <span class="menu-hint-text">แตะ <b>⋯</b> ตรงนี้ แล้วเลือก “เปิดในเบราว์เซอร์”<br>เพื่อดาวน์โหลดแอป</span>
     <svg class="menu-hint-arrow" viewBox="0 0 48 56" width="48" height="56" aria-hidden="true">
@@ -252,7 +256,7 @@
         <span class="store-name">Google Play</span>
         <span class="store-devices">Android</span>
       </a>
-      <!-- Shown only where the store buttons cannot work: the way out to a real browser. -->
+      <!-- Shown on phones, for where the store button cannot work: the way out to a real browser. -->
       <button class="store copy-link" id="copy-link" type="button" hidden>
         <span class="store-name">คัดลอกลิงก์</span>
         <span class="store-devices"></span>
@@ -263,7 +267,7 @@
 
     <!-- Which copy of the page this is. Raise it with every change, so a browser still
          showing an old copy can be told from one where the change did not work. -->
-    <p class="version" id="version">v13</p>
+    <p class="version" id="version">v14</p>
   </main>
 
   <script>
@@ -297,30 +301,34 @@
       //   Android — only the store's web address does, and it opens as a page inside TikTok
       //             where nobody is signed in, so nothing can be installed from it.
       // The store itself is asked for all the same, never its web page, and if TikTok refuses
-      // so be it: the page stays, with the ways out that do work. An arrow at the top right
-      // points at TikTok's own ⋯ menu, which opens the page in a real browser; a button copies
-      // the address, which TikTok allows; and the picture shows how to search the store.
+      // so be it: the page stays, with the ways out that do work, set up further down. An arrow
+      // at the top right points at TikTok's own ⋯ menu, which opens the page in a real browser;
+      // a button copies the address, which TikTok allows; and the picture shows how to search
+      // the store.
       var isTikTok = /musical_ly|trill|BytedanceWebview|TikTok/i.test(ua);
       // Beside the version, what this page took the browser for — so a report of "it does
       // not work" says which of these paths it was on.
       document.getElementById("version").textContent +=
         " · " + (isTikTok ? "tiktok " : "") + (isApple ? "ios" : "android");
 
+      // Every phone gets the ways out, not only TikTok: whichever app's browser this is, if
+      // it will not be sent to the store they are what is left. A browser that does go to the
+      // store leaves before anyone reads them.
+      document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
+      document.body.classList.add("on-phone");
+      document.getElementById("menu-hint").hidden = false;
+
+      var copy = document.getElementById("copy-link");
+      var copyName = copy.querySelector(".store-name");
+      copy.querySelector(".store-devices").textContent = "ไปเปิดใน " + (isApple ? "Safari" : "Chrome");
+      copy.hidden = false;
+      copy.addEventListener("click", function () {
+        navigator.clipboard.writeText("https://himondayapp.github.io/").then(
+          function () { copyName.textContent = "คัดลอกแล้ว ✓"; },
+          function () { copyName.textContent = "คัดลอกไม่ได้"; });
+      });
+
       if (isTikTok) {
-        document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
-        document.body.classList.add("in-tiktok");
-        document.getElementById("menu-hint").hidden = false;
-
-        var copy = document.getElementById("copy-link");
-        var copyName = copy.querySelector(".store-name");
-        copy.querySelector(".store-devices").textContent = "ไปเปิดใน " + (isApple ? "Safari" : "Chrome");
-        copy.hidden = false;
-        copy.addEventListener("click", function () {
-          navigator.clipboard.writeText("https://himondayapp.github.io/").then(
-            function () { copyName.textContent = "คัดลอกแล้ว ✓"; },
-            function () { copyName.textContent = "คัดลอกไม่ได้"; });
-        });
-
         if (isAndroid) {
           // The Play app itself. Asked for from a hidden frame, so that a refusal cannot put
           // an error page where this one is.
@@ -340,12 +348,11 @@
       note.textContent = "กำลังพาไปที่ " + storeName + "…";
       location.replace(target.href);
       // Still here and still on screen two seconds later: the browser refused to be sent on.
-      // Stretch the one button that matters over the whole page, so a tap anywhere is a tap on
-      // it. It stays a real link — a script sending the page on after a tap is no different
-      // from the redirect that was just refused.
+      // Stretch the store button over the whole page, so a tap anywhere but the copy button
+      // is a tap on it. It stays a real link — a script sending the page on after a tap is no
+      // different from the redirect that was just refused.
       setTimeout(function () {
         if (document.visibilityState !== "visible") return;
-        document.getElementById(isApple ? "google-play" : "app-store").style.display = "none";
         target.classList.add("everywhere");
         note.textContent = "แตะที่ไหนก็ได้เพื่อเปิด " + storeName;
       }, 2000);
