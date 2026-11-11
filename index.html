@@ -167,8 +167,27 @@
         : isAndroid ? document.getElementById("google-play")
         : null;
       if (!target) return;
-      document.getElementById("redirecting").textContent =
-        "กำลังพาไปที่ " + target.querySelector(".store-name").textContent + "…";
+      var note = document.getElementById("redirecting");
+      var storeName = target.querySelector(".store-name").textContent;
+
+      // TikTok's own browser refuses to leave for a store unless the visitor taps something,
+      // and sending it to the store's web address strands them on a page that goes nowhere.
+      // So: ask the store app directly from a hidden frame — if that is refused nothing on
+      // this page changes — and leave the one button that matters with a line saying to tap it.
+      if (/musical_ly|trill|BytedanceWebview|TikTok/i.test(ua)) {
+        var other = document.getElementById(isApple ? "google-play" : "app-store");
+        other.style.display = "none";
+        note.textContent = "แตะปุ่มด้านบนเพื่อเปิด " + storeName;
+        var frame = document.createElement("iframe");
+        frame.style.display = "none";
+        frame.src = isApple
+          ? "itms-apps://apps.apple.com/app/id6782075660"
+          : "market://details?id=com.hellomonday";
+        document.body.appendChild(frame);
+        return;
+      }
+
+      note.textContent = "กำลังพาไปที่ " + storeName + "…";
       location.replace(target.href);
     })();
   </script>
